@@ -22,15 +22,18 @@ python process_gdelt.py
 
 This will create the files required to compute the filtered metrics.
 
+
 ### Reproducing results of TeRDy
 
-In order to reproduce the results of TeRDy on the three datasets in the paper,  run the following commands
+In order to reproduce the results of TeRDy on the three datasets in the paper, run the following commands
 
 ```
-bash GDELT.sh
+bash run_TeRDy_GDELT.sh
 
-bash run_ICEWS14.sh
+bash run_TeRDy_ICEWS14.sh
 
-bash run_ICEWS15.sh
+bash run_TeRDy_ICEWS15.sh
 ```
 
+
+Our training framework is primarily based on TeAST and TCompoundE from the papers "Teast: Temporal knowledge graph embedding via archimedean spiral timeline (ACL 2023)" and "Simple but Effective Compound Geometric Operations for Temporal Knowledge Graph Completion (ACL 2024)", respectively.

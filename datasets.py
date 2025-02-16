@@ -23,9 +23,9 @@ class TemporalDataset(object):
             self.data[f] = pickle.load(in_file)
 
         maxis = np.max(self.data['train'], axis=0)
-        self.n_entities = int(max(maxis[0], maxis[2]) + 1)          # 获取实体数目
-        self.n_predicates = int(maxis[1] + 1)                       # 获取关系数目
-        self.n_predicates *= 2                                      # 关系加上反转关系
+        self.n_entities = int(max(maxis[0], maxis[2]) + 1)          # number of entities
+        self.n_predicates = int(maxis[1] + 1)                       # number of relations
+        self.n_predicates *= 2                                      # relation and its inverse
 
         if self.data['valid'].shape[1]>4:
             self.interval = True 
@@ -34,7 +34,7 @@ class TemporalDataset(object):
         else:
             self.interval = False
             
-        if maxis.shape[0] > 4:              # 判断事实的形状是四元组还是五元组
+        if maxis.shape[0] > 4:
             self.n_timestamps = max(int(maxis[3] + 1), int(maxis[4] + 1))
         else:
             self.n_timestamps = int(maxis[3] + 1)
@@ -72,7 +72,7 @@ class TemporalDataset(object):
 
     def get_train(self):
         copy = np.copy(self.data['train'])
-        tmp = np.copy(copy[:, 0])                       # 将关系建模反转关系增加训练样本
+        tmp = np.copy(copy[:, 0])
         copy[:, 0] = copy[:, 2]
         copy[:, 2] = tmp
         copy[:, 1] += self.n_predicates // 2

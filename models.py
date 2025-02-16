@@ -42,9 +42,9 @@ class TKBCModel(nn.Module, ABC):
             c_begin = 0
             while c_begin < self.sizes[2]:
                 b_begin = 0
-                rhs = self.get_rhs(c_begin, chunk_size)  # 将输入进来的训练集分为几个batch
+                rhs = self.get_rhs(c_begin, chunk_size)
                 while b_begin < len(queries):
-                    if queries.shape[1] > 4:              # time intervals exist   对五元组中时间戳的处理
+                    if queries.shape[1] > 4:              # time intervals exist
                         these_queries = queries[b_begin:b_begin + batch_size]
                         start_queries = []
                         end_queries = []
@@ -63,7 +63,7 @@ class TKBCModel(nn.Module, ABC):
                                 end =-int(triple[4].split('-')[1].replace('#', '0'))
                             elif triple[4][0] != '-':
                                 end = int(triple[4].split('-')[0].replace('#','0'))
-                            for key, time_idx in sorted(year2id.items(), key=lambda x:x[1]):        # 时间戳转换成id
+                            for key, time_idx in sorted(year2id.items(), key=lambda x:x[1]):        # timestamp -> id
                                 if start>=key[0] and start<=key[1]:
                                     start_idx = time_idx
                                 if end>=key[0] and end<=key[1]:
@@ -201,7 +201,7 @@ class TCompoundE(TKBCModel):
 
     def get_queries(self, queries: torch.Tensor):
         lhs = self.embeddings[0](queries[:, 0])
-        rel = self.embeddings[1](queries[:, 1]) 
+        rel = self.embeddings[1](queries[:, 1])
         time = self.embeddings[2](queries[:, 3])
         
         lhs = lhs[:, :self.rank], lhs[:, self.rank:]
@@ -212,9 +212,9 @@ class TCompoundE(TKBCModel):
         return (lhs[0] + rt[1]) * rt[0]
 
 
-class TCompoundE_DS(TKBCModel):    # deepseek
+class TeRDy(TKBCModel):    # deepseek
     def __init__(self, sizes: Tuple[int, int, int, int], rank: int, no_time_emb=False, alpha: float = 10, init_size: float = 1e-2):
-        super(TCompoundE_DS, self).__init__()
+        super(TeRDy, self).__init__()
         self.sizes = sizes
         self.rank = rank
         self.embeddings = nn.ModuleList([
@@ -237,9 +237,9 @@ class TCompoundE_DS(TKBCModel):    # deepseek
     def decompose_relation_fft(self, rel_embedding):
         freq_domain = fft.fft(rel_embedding, dim=1)
         freqs = fft.fftfreq(self.rank, d=1.0).to(rel_embedding.device)
-        abs_freqs = torch.abs(freqs)  # 取频率绝对值
-        low_freq_mask = torch.exp(-abs_freqs * self.alpha).view(1, -1)  # 平滑低通滤波
-        high_freq_mask = 1.0 - low_freq_mask  # 高频部分是剩下的部分
+        abs_freqs = torch.abs(freqs)
+        low_freq_mask = torch.exp(-abs_freqs * self.alpha).view(1, -1)
+        high_freq_mask = 1.0 - low_freq_mask
         low_freq = freq_domain * low_freq_mask
         high_freq = freq_domain * high_freq_mask
         low_freq_component = fft.ifft(low_freq, dim=1).real

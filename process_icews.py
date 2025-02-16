@@ -23,7 +23,7 @@ def prepare_dataset(path, name):
     rel_id / ent_id for analysis.
     """
     files = ['train', 'valid', 'test']
-    entities, relations, timestamps = set(), set(), set()       # 读取文件，获得实体、关系和时间戳
+    entities, relations, timestamps = set(), set(), set()
     for f in files:
         file_path = os.path.join(path, f)
         to_read = open(file_path, 'r')
@@ -34,7 +34,7 @@ def prepare_dataset(path, name):
             relations.add(rel)
             timestamps.add(timestamp)
         to_read.close()
-    # 将关系、实体和时间戳赋予id
+
     entities_to_id = {x: i for (i, x) in enumerate(sorted(entities))}
     relations_to_id = {x: i for (i, x) in enumerate(sorted(relations))}
     timestamps_to_id = {x: i for (i, x) in enumerate(sorted(timestamps))}
@@ -62,7 +62,6 @@ def prepare_dataset(path, name):
                 examples.append([entities_to_id[lhs], relations_to_id[rel], entities_to_id[rhs], timestamps_to_id[ts]])
             except ValueError:
                 continue
-        # 将三元组的id形式在文件中保存下来
         out = open(Path(DATA_PATH) / name / (f + '.pickle'), 'wb')
         pickle.dump(np.array(examples).astype('uint64'), out)
         out.close()
@@ -74,7 +73,7 @@ def prepare_dataset(path, name):
     for f in files:
         examples = pickle.load(open(Path(DATA_PATH) / name / (f + '.pickle'), 'rb'))
         for lhs, rel, rhs, ts in examples:
-            to_skip['lhs'][(rhs, rel + n_relations, ts)].add(lhs)  # reciprocals    可以根据缺失三元组找到所有正确实体
+            to_skip['lhs'][(rhs, rel + n_relations, ts)].add(lhs)  # reciprocals
             to_skip['rhs'][(lhs, rel, ts)].add(rhs)
 
     to_skip_final = {'lhs': {}, 'rhs': {}}
@@ -93,7 +92,7 @@ def prepare_dataset(path, name):
         'both': np.zeros(n_entities)
     }
 
-    for lhs, rel, rhs, _ts in examples:         # 计算出现的频率
+    for lhs, rel, rhs, _ts in examples:
         counters['lhs'][lhs] += 1
         counters['rhs'][rhs] += 1
         counters['both'][lhs] += 1

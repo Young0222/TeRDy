@@ -7,7 +7,7 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 from datasets import TemporalDataset
 from optimizers import TKBCOptimizer, TKBCOptimizer_sparse
-from models import TCompoundE, TCompoundE_DS
+from models import TCompoundE, TeRDy
 from regularizers import N3, Lambda3
 import os
 from torch.optim.lr_scheduler import LambdaLR
@@ -16,7 +16,7 @@ from torch.optim.lr_scheduler import LambdaLR
 os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3,4,5,6"
 
 parser = argparse.ArgumentParser(
-    description="TCompoundE_DS"
+    description="TeRDy"
 )
 parser.add_argument(
     '--dataset', type=str, default='ICEWS14',
@@ -24,7 +24,7 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    '--model', default='TCompoundE_DS', type=str,
+    '--model', default='TeRDy', type=str,
     help="Model Name"
 )
 parser.add_argument(
@@ -111,14 +111,8 @@ def learn(model=args.model,
     print("device: ", device)
     dataset = TemporalDataset(dataset, device)
     
-    sizes = dataset.get_shape()
-    # model = {
-    #     'TCompoundE_DS': TCompoundE(sizes, rank, no_time_emb=args.no_time_emb)
-    # }[model]
-
     model = {
-        # 'TCompoundE_DS': TCompoundE_DS(sizes, rank, no_time_emb=args.no_time_emb)
-        'TCompoundE_DS': TCompoundE_DS(sizes, rank, no_time_emb=args.no_time_emb, alpha=args.alpha)
+        'TeRDy': TeRDy(sizes, rank, no_time_emb=args.no_time_emb, alpha=args.alpha)
     }[model]
 
     model = model.to(device)
@@ -135,15 +129,6 @@ def learn(model=args.model,
         opt = optim.NAdam(model.parameters(), lr=learning_rate)
     else:
         opt = optim.Adagrad(model.parameters(), lr=learning_rate)
-
-    # def lr_lambda(epoch):
-    #     if epoch < 10:
-    #         return float(epoch + 1) / 10
-    #     else:
-    #         # 衰减阶段，学习率按照步长衰减
-    #         return 0.1 ** (epoch - 10)  # 这里可以选择不同的衰减策略
-    # scheduler = LambdaLR(opt, lr_lambda=lr_lambda)
-
 
     print("Start training process: ", modelname, "on", datasetname, "using", "rank =", rank, "lr =", learning_rate, "emb_reg =", emb_reg, "time_reg =", time_reg, "freq_reg =", freq_reg)
 
@@ -173,8 +158,6 @@ def learn(model=args.model,
         )
 
         optimizer.epoch(examples, device)   # traing model
-
-        # scheduler.step()
        
         if epoch < 0 or (epoch + 1) % args.valid_freq == 0:
 
