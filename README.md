@@ -10,6 +10,10 @@ conda install --file requirements.txt -c pytorch
 
 ### Datasets
 
+For complete datasets, you can download from: https://github.com/nk-ruiying/TCompoundE/tree/main/src_data
+
+Use the following command to process the dataset:
+
 ```
 python process_icews.py
 
