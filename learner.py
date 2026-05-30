@@ -110,6 +110,7 @@ def learn(model=args.model,
     device = torch.device("cuda:"+str(args.gpu) if torch.cuda.is_available() else "cpu")
     print("device: ", device)
     dataset = TemporalDataset(dataset, device)
+    sizes = dataset.get_shape()
     
     model = {
         'TeRDy': TeRDy(sizes, rank, no_time_emb=args.no_time_emb, alpha=args.alpha)
