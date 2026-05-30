@@ -35,7 +35,6 @@ This helps the model capture both stable trends and short-time changes.
 ## 📄 Paper
 
 - **Title**: *TeRDy: Temporal Relation Dynamics through Frequency Decomposition for Temporal Knowledge Graph Completion*
-- **Authors**: Ziyang Liu, Chaokun Wang
 - **Venue**: ACL 2025
 - [🔗](https://aclanthology.org/2025.acl-long.473/)
 
